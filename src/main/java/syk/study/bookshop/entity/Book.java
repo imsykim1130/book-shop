@@ -1,7 +1,6 @@
 package syk.study.bookshop.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,29 +10,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Book {
     @Id
-    private String isbn;
-    private String title;
-    private String infoLink;
-    private String imgLink;
-    private String author;
-    private String discount;
-    private String publisher;
-    private String description;
-    private String pubDate;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="book_id")
+    private Long id;
+    private int stock;
+    private BookCondition condition;
+    private boolean isSold;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public Book createBook(String isbn, String title, String infoLink, String imgLink, String author, String discount, String publisher, String description, String pubDate) {
-        Book book = new Book();
-        
-        book.isbn = isbn;
-        book.title = title;
-        book.infoLink = infoLink;
-        book.imgLink = imgLink;
-        book.author = author;
-        book.discount = discount;
-        book.publisher = publisher;
-        book.description = description;
-        book.pubDate = pubDate;
-
-        return book;
+    public Book(User user) {
+        this.user = user;
     }
 }
