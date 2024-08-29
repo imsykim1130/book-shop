@@ -2,7 +2,6 @@ package syk.study.bookshop.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import syk.study.bookshop.entity.Book;
 import syk.study.bookshop.entity.BookRequestDto;
 import syk.study.bookshop.entity.BookResponseDto;
 import syk.study.bookshop.repository.BookRepository;
@@ -48,9 +47,10 @@ public class BookService {
         requestHeaders.put("X-Naver-Client-Id", "kkNA172GeJMdHwEi09UM");
         requestHeaders.put("X-Naver-Client-Secret", "3ZhUJlBd6V");
 
-        String result = get(url, requestHeaders); // String 형태로 받아온다
+        String stringResult = get(url, requestHeaders); // String 형태로 받아온다
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(result, BookResponseDto.class);
+        BookResponseDto result = objectMapper.readValue(stringResult, BookResponseDto.class);
+        return result;
     };
 
     private static String get(String url, Map<String, String> requestHeaders) {

@@ -4,7 +4,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import syk.study.bookshop.entity.User;
 import syk.study.bookshop.repository.UserRepository;
 
 @Component
@@ -25,7 +24,6 @@ public class Data {
         private final UserRepository userRepository;
 
         public void init1() {
-            User user = userRepository.save(new User("admin", "admin"));
         }
     }
 }

@@ -1,12 +1,8 @@
 package syk.study.bookshop.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -17,13 +13,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
+    @NonNull
     private String username;
+    @NonNull
     private String password;
-    @OneToMany(mappedBy = "user")
-    private List<Book> books = new ArrayList<>();
+    @Embedded
+    @NonNull
+    private Address address; // street, city
+    private String authority; // 권한(user, admin)
+    private boolean isValid; // 탈퇴 or 휴면 여부
 
-    public User(String username, String password) {
+    @Builder
+    public User(String username, String password, String street, String city) {
         this.username = username;
         this.password = password;
+        this.address = new Address(street, city);
+        this.authority = "user";
+        this.isValid = true;
     }
 }
