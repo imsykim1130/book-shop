@@ -3,7 +3,6 @@ package syk.study.bookshop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,18 +16,19 @@ public class User {
     private String username;
     @NonNull
     private String password;
-    @Embedded
-    @NonNull
-    private Address address; // street, city
     private String authority; // 권한(user, admin)
     private boolean isValid; // 탈퇴 or 휴면 여부
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    private Address address;
 
     @Builder
-    public User(String username, String password, String street, String city) {
+    public User(String username, String password, Address address) {
         this.username = username;
         this.password = password;
-        this.address = new Address(street, city);
+        this.address = address;
         this.authority = "user";
         this.isValid = true;
     }
+
 }

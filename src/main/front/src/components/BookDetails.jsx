@@ -1,152 +1,169 @@
-import React, {useEffect, useState} from 'react';
-import {useParams} from "react-router-dom";
+import React from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 const BookDetails = () => {
-    const {isbn} = useParams();
-    const [data, setData] = useState({});
-    const [loading, setLoading] = React.useState(false);
-    const [error, setError] = React.useState(null);
-    const [condition, setCondition] = React.useState("MIDDLE");
-    const [title, setTitle] = React.useState("");
-    const [post, setPost] = React.useState("");
+  const { state } = useLocation();
+  const { book } = state;
+  const [condition, setCondition] = React.useState("MIDDLE");
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [forSaleData, setForSaleData] = React.useState([]);
+  const [forSaleLoading, setForSaleLoading] = React.useState(false);
 
-    const getData = async () => {
+  const handleChange = (e) => {
+    setCondition(e.target.value);
+  };
 
-        setLoading(true);
-        setData([]);
-        setError(null);
-
-        try {
-            const response = await axios.get("/api/books/is?isbn=" + isbn)
-                .then((res) => {
-                    console.log(res.data.items[0]);
-                    setData(res.data.items[0]);
-                    setLoading(false);
-                })
-
-        } catch (e) {
-            setError(e);
-        }
-
+  const registerBook = async () => {
+    try {
+      await axios
+        .post("/api/register/book", {
+          username: "admin2",
+          condition: condition,
+          item: book,
+        })
+        .then((res) => console.log(res.data));
+    } catch (e) {
+      console.log(e);
     }
+  };
 
-    const handleChange = (e) => {
-        setCondition(e.target.value);
-        console.log(e.target.value);
+  const shoppingCartBook = async () => {
+    try {
+      await axios
+        .post("/api/shopping-cart", {
+          username: "admin",
+          isbn: book.isbn,
+        })
+        .then((res) => console.log(res.data));
+    } catch (e) {
+      console.log(e);
     }
+  };
 
-    const handleTitleChange = (e) => {
-        setTitle(e.target.value);
-    }
+  useEffect(() => {
+    console.log(state);
+  }, []);
 
-    const handlePostChange = (e) => {
-        setPost(e.target.value);
-    }
-
-
-    const addBookToShoppingCart = async () => {
-        try {
-            await axios.post("/api/shopping-cart", {
-                username: "admin",
-                isbn: isbn,
-                condition: condition,
-                title: title,
-                post: post,
-            })
-                .then(res=>console.log(res.data));
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    const handleClickShoppingCart = (e) => {
-        e.preventDefault();
-        addBookToShoppingCart();
-    }
-
-
-    useEffect(() => {
-        !loading && getData();
-    }, []);
-
-    return (
-        <div className="w-full flex flex-col items-center">
-            <div className="flex flex-col items-center">
-                {
-                    loading ?
-                        <p>loading...</p> :
-                        <div className="w-4/5 flex flex-col justify-between items-center">
-                            <div className="w-[200px] mt-3">
-                                <img src={data.image} alt="book cover image"/>
-                            </div>
-                            <h1 className="text-3xl font-bold mt-5">{data.title}</h1>
-                            <p className="mt-3 font-bold">{data.author}</p>
-                        </div>
-                }
-            </div>
-            <form className="w-4/5 flex flex-col mt-8 text-sm">
-                <div className="flex flex-3 mb-5">
-                    <div className="flex-1">
-                        <h3>책 상태</h3>
-                        <div className="mt-2 flex">
-                            <div className="flex items-center mr-6">
-                                <input  checked={condition === "HIGH"}
-                                        id="default-radio-1" type="radio" value="HIGH" name="default-radio"
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                        onClick={handleChange}
-                                />
-                                <label htmlFor="default-radio-1"
-                                       className="ms-2 text-sm font-medium text-gray-500">상</label>
-                            </div>
-                            <div className="flex items-center mr-6">
-                                <input checked={condition === "MIDDLE"}
-                                       id="default-radio-2" type="radio" value="MIDDLE" name="default-radio"
-                                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                       onClick={handleChange}
-                                />
-                                <label htmlFor="default-radio-2"
-                                       className="ms-2 text-sm font-medium text-gray-500">중</label>
-                            </div>
-                            <div className="flex items-center mr-6">
-                                <input checked={condition === "LOW"}
-                                       id="default-radio-3" type="radio" value="LOW" name="default-radio"
-                                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                                       onClick={handleChange}
-                                />
-                                <label htmlFor="default-radio-3"
-                                       className="ms-2 text-sm font-medium text-gray-500">하</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex-1 mb-6">
-                    <div className="mb-5">
-                        <h3>제목</h3>
-                        <input type="text"
-                               className="focus:outline-none bg-gray-200 px-3 py-1.5 mt-1 w-full"
-                                value={title}
-                               onChange={handleTitleChange}
-                        />
-                    </div>
-                    <div>
-                        <h3>본문</h3>
-                        <textarea
-                            className="w-full h-[200px] bg-gray-200 mt-1 p-3"
-                            value={post}
-                            onChange={handlePostChange}
-                        />
-                    </div>
-                </div>
-                <input
-                    type="submit"
-                    value="판매 장바구니 등록"
-                    className="bg-gray-200 p-3 mb-10 hover:bg-amber-400"
-                    onClick={handleClickShoppingCart}
-                />
-            </form>
+  return (
+    <div className="flex flex-col items-center mx-[15%] md:items-start">
+      <div className="flex flex-col items-center md:items-start md:flex-row">
+        <div className="mt-3 flex flex-col items-center">
+          <div className="w-[200px] md:w-[300px] ">
+            <img src={book.image} alt="book cover image" />
+          </div>
+          <div className="mt-6 w-[220px] flex justify-between">
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => shoppingCartBook()}
+            >
+              장바구니 담기
+            </button>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => setModalOpen(true)}
+            >
+              판매하기
+            </button>
+          </div>
         </div>
-    );
+        <div className="flex-1 md:ml-20 text-center md:text-left">
+          <h1 className="text-3xl font-bold mt-5">{book.title}</h1>
+          <p className="mt-2 text-sm text-gray-600">{book.publisher}</p>
+          <p className="mt-1 text-sm text-gray-900">{book.author}</p>
+          <p className="mt-10">{book.description}</p>
+        </div>
+      </div>
+
+      {/* modal */}
+      {modalOpen && (
+        <div className="absolute top-1/3 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+          <div className="relative p-4 w-full max-w-md max-h-full">
+            <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
+              <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  책 판매 등록
+                </h3>
+                <button
+                  type="button"
+                  className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  onClick={() => setModalOpen(false)}
+                >
+                  <svg
+                    className="w-3 h-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 14"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                    />
+                  </svg>
+                  <span className="sr-only">Close modal</span>
+                </button>
+              </div>
+
+              <div className="p-4 md:p-5">
+                <p className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                  판매하고자 하는 책의 상태를 선택해주세요.
+                  <br />책 상태에 따라 정해진 할인율이 원가에 적용되어 최종
+                  판매가격이 됩니다.
+                </p>
+                <fieldset className="text-gray-200 grid gap-3 my-5">
+                  <div>
+                    <input
+                      type="radio"
+                      value="HIGH"
+                      id="high"
+                      className="mr-2"
+                      checked={condition === "HIGH"}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="high">상 - 70%</label>
+                  </div>
+                  <div>
+                    <input
+                      type="radio"
+                      value="MIDDLE"
+                      id="middle"
+                      className="mr-2"
+                      checked={condition === "MIDDLE"}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="middle">중 - 50%</label>
+                  </div>
+                  <div>
+                    <input
+                      type="radio"
+                      value="LOW"
+                      id="low"
+                      className="mr-2"
+                      checked={condition === "LOW"}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="low">하 - 30%</label>
+                  </div>
+                </fieldset>
+
+                <button
+                  className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={() => registerBook()}
+                >
+                  판매하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default BookDetails;

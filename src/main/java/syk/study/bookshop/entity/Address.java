@@ -1,17 +1,22 @@
 package syk.study.bookshop.entity;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Embeddable // 기본 생성자 반드시 필요
-// 임베디드 객체는 생성 이후 불변해야 하므로 setter 절대 쓰지 않는다
+@Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Getter
 public class Address {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "address_id")
+    private Long id;
     private String street;
     private String city;
+
+    public Address(String street, String city) {
+        this.street = street;
+        this.city = city;
+    }
 }
