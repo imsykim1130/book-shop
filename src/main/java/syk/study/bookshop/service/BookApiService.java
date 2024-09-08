@@ -4,8 +4,8 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import syk.study.bookshop.xml.Channel;
+import syk.study.bookshop.dto.BookDto;
+import syk.study.bookshop.dto.BookSearchResponseDto;
 import syk.study.bookshop.xml.Item;
 import syk.study.bookshop.xml.Rss;
 
@@ -16,13 +16,14 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 public class BookApiService {
 
-    public Channel getBooksByTitle(String title, String display, String start) throws IOException {
+    // 제목으로 책 검색(검색결과 여러개)
+    public BookSearchResponseDto getBooksByTitle(String title, String display, String start) throws IOException {
         String encodedTitle;
         String query;
 
@@ -33,14 +34,22 @@ public class BookApiService {
             throw new RuntimeException("검색어 인코딩 실패");
         }
 
-        return getData(query).getChannel();
+        int total = Integer.parseInt(getData(query).getChannel().getTotal());
+        List<BookDto> bookDtos = getData(query).getChannel().getItem().stream().map(item -> BookDto.newBookDto(item)).toList();
+
+        return new BookSearchResponseDto(total, bookDtos);
     }
 
-    public Item getBookByIsbn(String isbn) throws IOException {
+
+    // isbn 으로 책 검색(검색결과 1개)
+    public BookDto getBookByIsbn(String isbn) throws IOException {
         String query = "d_isbn=" + isbn;
-        return getData(query).getChannel().getItem().getFirst();
+        Item item = getData(query).getChannel().getItem().getFirst();
+        return BookDto.newBookDto(item);
     }
 
+
+    // 여기 아래로 naver api 에서 데이터 받아오는 코드
     private Rss getData(String query) throws IOException {
         String url = "https://openapi.naver.com/v1/search/book_adv.xml?" + query;
 

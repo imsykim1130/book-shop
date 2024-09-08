@@ -1,10 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   return (
     <header>
-      <div className="w-full flex items-center justify-between px-7 pt-7">
+      <div className="w-full flex items-center justify-between pt-7">
         <div className="logo">
           <Link to="/">
             <svg
@@ -18,9 +20,11 @@ const Header = () => {
           </Link>
         </div>
         <nav className="flex items-center text-sm">
-          <span className="pl-6">HOME</span>
-          <span className="pl-6">BOARD</span>
-          <span className="pl-6">MY PAGE</span>
+          <button className="pl-6">HOME</button>
+          <button className="pl-6">MY PAGE</button>
+          <button className="pl-6" onClick={() => navigate("/shopping-cart")}>
+            CART
+          </button>
         </nav>
       </div>
     </header>

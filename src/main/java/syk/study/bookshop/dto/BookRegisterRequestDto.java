@@ -10,5 +10,5 @@ import syk.study.bookshop.xml.Item;
 public class BookRegisterRequestDto {
     private String username;
     private BookCondition condition;
-    private Item item;
+    private BookDto bookDto;
 }

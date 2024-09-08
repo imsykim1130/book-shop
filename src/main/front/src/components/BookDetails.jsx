@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import ForSaleBook from "./ForSaleBook.jsx";
 
 const BookDetails = () => {
   const { state } = useLocation();
@@ -21,7 +22,7 @@ const BookDetails = () => {
         .post("/api/register/book", {
           username: "admin2",
           condition: condition,
-          item: book,
+          bookDto: book,
         })
         .then((res) => console.log(res.data));
     } catch (e) {
@@ -29,44 +30,37 @@ const BookDetails = () => {
     }
   };
 
-  const shoppingCartBook = async () => {
+  const getForSaleData = async () => {
     try {
-      await axios
-        .post("/api/shopping-cart", {
-          username: "admin",
-          isbn: book.isbn,
-        })
-        .then((res) => console.log(res.data));
+      await axios.get("/api/for-sales-books?isbn=" + book.isbn).then((res) => {
+        setForSaleData(res.data);
+        console.log(res.data);
+        setForSaleLoading(false);
+      });
     } catch (e) {
       console.log(e);
     }
   };
 
   useEffect(() => {
-    console.log(state);
+    setForSaleLoading(true);
+    getForSaleData();
   }, []);
 
   return (
     <div className="flex flex-col items-center mx-[15%] md:items-start">
+      {/* 책 상세정보 */}
       <div className="flex flex-col items-center md:items-start md:flex-row">
         <div className="mt-3 flex flex-col items-center">
           <div className="w-[200px] md:w-[300px] ">
             <img src={book.image} alt="book cover image" />
           </div>
-          <div className="mt-6 w-[220px] flex justify-between">
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={() => shoppingCartBook()}
-            >
-              장바구니 담기
-            </button>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-              onClick={() => setModalOpen(true)}
-            >
-              판매하기
-            </button>
-          </div>
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+            onClick={() => setModalOpen(true)}
+          >
+            판매하기
+          </button>
         </div>
         <div className="flex-1 md:ml-20 text-center md:text-left">
           <h1 className="text-3xl font-bold mt-5">{book.title}</h1>
@@ -162,6 +156,20 @@ const BookDetails = () => {
           </div>
         </div>
       )}
+
+      {/* 판매중인 책 */}
+      <div className="w-full mt-6">
+        <h1 className="font-bold text-xl mb-3">판매중인 책</h1>
+        {forSaleLoading ? (
+          <div>loading...</div>
+        ) : (
+          forSaleData.map((book, index) => {
+            return (
+              <ForSaleBook key={index} forSaleBook={book} number={index} />
+            );
+          })
+        )}
+      </div>
     </div>
   );
 };

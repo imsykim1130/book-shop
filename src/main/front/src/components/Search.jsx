@@ -3,7 +3,7 @@ import path from "node:path";
 
 const Search = ({ title, searchHandle }) => {
   return (
-    <div className="w-full flex items-center mt-5">
+    <div className="w-full flex items-center mt-5 absolute left-0">
       <div className="w-full flex items-center shadow-md px-7">
         <svg
           xmlns="http://www.w3.org/2000/svg"

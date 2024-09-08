@@ -3,6 +3,7 @@ import axios from "axios";
 import Book from "./Book.jsx";
 import { useDebounce } from "../customHook/useDebounce.jsx";
 import Search from "./Search.jsx";
+import { BookData } from "./Data.jsx";
 
 const Home = () => {
   const [data, setData] = React.useState([]);
@@ -16,19 +17,6 @@ const Home = () => {
   const [top10Loading, setTop10Loading] = React.useState(false);
   const [top10Reload, setTop10Reload] = React.useState(false);
 
-  class BookData {
-    constructor(item) {
-      this.item = item;
-      this.title = item.title;
-      this.image = item.image;
-      this.author = item.author;
-      this.publisher = item.publisher;
-      this.price = item.discount;
-      this.isbn = item.isbn;
-      this.description = item.description;
-    }
-  }
-
   const getData = async () => {
     setLoading(true);
     setData([]);
@@ -38,7 +26,7 @@ const Home = () => {
       const response = await axios
         .get("/api/books?title=" + title + "&display=" + display + "&start=1")
         .then((res) => {
-          setData(res.data.item.map((item) => new BookData(item)));
+          setData(res.data.books.map((book) => new BookData(book)));
           setTotal(res.data.total);
           setLoading(false);
         });
@@ -51,7 +39,7 @@ const Home = () => {
     setTop10Loading(true);
     try {
       const response = await axios.get("/api/books/top10").then((res) => {
-        setTop10Data(res.data);
+        setTop10Data(res.data.map((book) => new BookData(book)));
         setTop10Loading(false);
       });
     } catch (e) {
@@ -75,7 +63,7 @@ const Home = () => {
   return (
     <div className="w-[100vw] h-[100vh] flex flex-col overflow-x-hidden">
       <Search title={title} searchHandle={searchHandle} />
-      <section className="mx-7 mt-8">
+      <section className="mt-28">
         {debouncedTitle.length !== 0 ? (
           <div className="flex justify-center mt-6">
             {data.length !== 0 ? (

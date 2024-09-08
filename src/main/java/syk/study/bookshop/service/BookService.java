@@ -3,6 +3,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import syk.study.bookshop.dto.BookDto;
 import syk.study.bookshop.dto.BookRegisterRequestDto;
 import syk.study.bookshop.xml.Item;
 import syk.study.bookshop.entity.Book;
@@ -30,12 +31,13 @@ public class BookService {
         User resultUser;
         Book resultBook;
 
-        boolean isBookExist = bookRepository.existsById(request.getItem().getIsbn());
+        boolean isBookExist = bookRepository.existsById(request.getBookDto().getIsbn());
 
         if (isBookExist) {
-            resultBook = bookRepository.findById(request.getItem().getIsbn()).get();
+            resultBook = bookRepository.findById(request.getBookDto().getIsbn()).get();
         } else {
-            resultBook = bookRepository.save(Book.makeNewBook(request.getItem()));
+           resultBook = Book.makeNewBook(request.getBookDto());
+           bookRepository.save(resultBook);
         }
 
         resultBook.plusStock();
@@ -54,14 +56,13 @@ public class BookService {
     }
 
     // 판매 순위 10위까지 책 가져오기
-    public List<Book> getTop10Books() {
+    public List<BookDto> getTop10Books() {
         Sort sortBy = Sort.by(Sort.Direction.DESC, "salesVolume");
-        return bookRepository.findAll(sortBy);
+        return bookRepository.findAll(sortBy).stream().map(book -> BookDto.newBookDto(book)).toList();
     }
 
     // isbn 으로 책 검색(책 하나)
-    public Book getBookByIsbn(String isbn) throws IOException {
-        Item item = bookApiService.getBookByIsbn(isbn);
-        return Book.makeNewBook(item);
+    public BookDto getBookByIsbn(String isbn) throws IOException {
+        return bookApiService.getBookByIsbn(isbn);
     }
 }

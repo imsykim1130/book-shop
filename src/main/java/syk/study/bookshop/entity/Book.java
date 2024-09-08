@@ -4,8 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import syk.study.bookshop.xml.Item;
-
+import syk.study.bookshop.dto.BookDto;
 
 @Entity
 @Getter
@@ -25,15 +24,15 @@ public class Book {
     private int stock;
     private int salesVolume;
 
-    public static Book makeNewBook(Item item) {
+    public static Book makeNewBook(BookDto bookDto) {
         Book book = new Book();
-        book.isbn = item.getIsbn();
-        book.title = item.getTitle();
-        book.author = item.getAuthor();
-        book.publisher = item.getPublisher();
-        book.description = item.getDescription();
-        book.price = item.getDiscount();
-        book.image = item.getImage();
+        book.isbn = bookDto.getIsbn();
+        book.title = bookDto.getTitle();
+        book.author = bookDto.getAuthor();
+        book.publisher = bookDto.getPublisher();
+        book.description = bookDto.getDescription();
+        book.price = bookDto.getPrice();
+        book.image = bookDto.getImage();
         book.stock = 0;
         book.salesVolume = 0;
         return book;

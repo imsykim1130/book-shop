@@ -1,5 +1,6 @@
 package syk.study.bookshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class User {
     private boolean isValid; // 탈퇴 or 휴면 여부
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
+    @JsonIgnore
     private Address address;
 
     @Builder

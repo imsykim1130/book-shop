@@ -1,5 +1,6 @@
 package syk.study.bookshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 public class ForSalesBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "forSaleBook_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,23 +23,27 @@ public class ForSalesBook {
 
     private BookCondition condition;
 
+    private int originPrice;
     private int price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    @JsonIgnore
+    private User seller;
 
     private boolean isSold;
 
     private LocalDateTime registerDate;
 
 
-    public ForSalesBook(Book book, BookCondition condition, User user) {
+    public ForSalesBook(Book book, BookCondition condition, User seller) {
         this.book = book;
         this.condition = condition;
-        this.user = user;
+        this.seller = seller;
+        this.originPrice = book.getPrice();
         this.price = (int) Math.floor(this.condition.getDiscount() * book.getPrice());
         this.isSold = false;
         this.registerDate = LocalDateTime.now();
     }
+
 }
